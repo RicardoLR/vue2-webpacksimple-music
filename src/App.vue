@@ -1,6 +1,8 @@
 <template lang="pug">
 	#app
 		h2 Musica
+		select(v-model="selectedCountry")
+			option(v-for="country in countries" v-bind:value="country.value") {{ country.name }} - {{ country.value }}
 		ul
 			artist(v-for="artist in artists" v-bind:artist="artist" v-bind:key="artist.mbid")
 </template>
@@ -14,18 +16,33 @@ export default {
 	name: 'app',
 	data () {
 		return {
-			artists: []
+			artists: [],
+			countries: [
+				{ name: "España", value: "spain"},
+				{ name: "Argentina", value: "argentina"},
+				{ name: "Colombia", value: "colombia"}
+			],
+			selectedCountry: "argentina"
 		}
 	},
 	components:{
 		Artist
 	},
+	methods:{
+		refreshArtists(){
+			// llamo al this de esta clase, no al global
+			const self = this 
+			getArtists(this.selectedCountry).then( items => self.artists = items )		
+		}
+	},
 	mounted: function(){
-
-		// llamo al this de esta clase, no al global
-		const self = this 
-
-		getArtists().then( items => self.artists = items )		
+		this.refreshArtists()
+	},
+	// Ver cambios en variable
+	watch: {
+		selectedCountry(){
+			this.refreshArtists()
+		}
 	}
 
 }
